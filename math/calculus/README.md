@@ -1,0 +1,1 @@
+Welcome to the Calculus side of things in Machine Learning
