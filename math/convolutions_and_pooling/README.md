@@ -1,0 +1,1 @@
+Welcome to the ever convolving and pooling side of things in Machine Learning
