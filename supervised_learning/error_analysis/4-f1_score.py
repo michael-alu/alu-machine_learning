@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
     A function def f1_score(confusion):
-    that calculates the F1 score for a confusion matrix 
+    that calculates the F1 score for a confusion matrix
 """
 
 
