@@ -32,26 +32,26 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
         return None, None, None, None
 
     n, d = X.shape
-    
+
     best_bic = np.inf
     best_k = None
     best_result = None
-    
+
     bics = []
     log_likelihoods = []
 
     for k in range(kmin, kmax + 1):
         res = expectation_maximization(X, k, iterations, tol, verbose)
-        
+    
         if res[0] is None:
             return None, None, None, None
-            
+
         pi, m, S, g, ll = res
 
         # Calculate number of parameters
         # p = priors + means + covariance matrices
         p = (k - 1) + (k * d) + (k * d * (d + 1) / 2)
-        
+
         # Calculate BIC
         bic = p * np.log(n) - 2 * ll
 
