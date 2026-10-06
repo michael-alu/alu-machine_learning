@@ -7,52 +7,63 @@ expectation_maximization = __import__('8-EM').expectation_maximization
 
 def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
     """Finds the best number of clusters using the BIC"""
-    if not isinstance(X, np.ndarray) or X.ndim != 2:
+    if type(X) is not np.ndarray or len(X.shape) != 2:
         return None, None, None, None
 
-    if not isinstance(kmin, int) or kmin < 1:
+    if type(kmin) is not int or kmin <= 0 or kmin >= X.shape[0]:
         return None, None, None, None
 
     if kmax is None:
-        kmax = kmin
+        kmax = X.shape[0]
 
-    if not isinstance(kmax, int) or kmax < kmin:
+    if type(kmax) is not int or kmax <= 0 or kmax > X.shape[0]:
         return None, None, None, None
 
-    if not isinstance(iterations, int) or iterations <= 0:
+    if kmin >= kmax:
         return None, None, None, None
 
-    if not isinstance(tol, float) or tol < 0:
+    if type(iterations) is not int or iterations <= 0:
         return None, None, None, None
 
-    if not isinstance(verbose, bool):
+    if type(tol) is not float or tol < 0:
+        return None, None, None, None
+
+    if type(verbose) is not bool:
         return None, None, None, None
 
     n, d = X.shape
-    k_range = range(kmin, kmax + 1)
-    num_k = len(k_range)
-    log_likelihoods = np.empty(num_k)
-    bics = np.empty(num_k)
-
+    
     best_bic = np.inf
     best_k = None
     best_result = None
+    
+    bics = []
+    log_likelihoods = []
 
-    for idx, k in enumerate(k_range):
-        pi, m, S, g, ll = expectation_maximization(X, k, iterations, tol, verbose)
-        if ll is None:
+    for k in range(kmin, kmax + 1):
+        res = expectation_maximization(X, k, iterations, tol, verbose)
+        
+        if res[0] is None:
             return None, None, None, None
+            
+        pi, m, S, g, ll = res
 
-        # Parameters: k-1 priors, k means (d), k covariances (d * (d+1)/2)
-        p = k * d + k * d * (d + 1) / 2 + k - 1
+        # Calculate number of parameters
+        # p = priors + means + covariance matrices
+        p = (k - 1) + (k * d) + (k * d * (d + 1) / 2)
+        
+        # Calculate BIC
         bic = p * np.log(n) - 2 * ll
 
-        log_likelihoods[idx] = ll
-        bics[idx] = bic
+        bics.append(bic)
+        log_likelihoods.append(ll)
 
         if bic < best_bic:
             best_bic = bic
             best_k = k
             best_result = (pi, m, S)
+
+    bics = np.array(bics)
+    log_likelihoods = np.array(log_likelihoods)
 
     return best_k, best_result, log_likelihoods, bics
