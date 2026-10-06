@@ -42,7 +42,7 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
 
     for k in range(kmin, kmax + 1):
         res = expectation_maximization(X, k, iterations, tol, verbose)
-    
+
         if res[0] is None:
             return None, None, None, None
 
